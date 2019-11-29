@@ -14,6 +14,37 @@ export default class Dashboard extends Component {
     balance: 0,
   };
 
+  componentDidMount() {
+    try {
+      const messageError = 'Whoops, something went wrong!';
+      const transactionsFromLocalStorage = localStorage.getItem('transactions');
+      const balanceFromLocalStorage = localStorage.getItem('balance');
+
+      if (transactionsFromLocalStorage && balanceFromLocalStorage) {
+        this.setState({
+          transactions: JSON.parse(transactionsFromLocalStorage),
+          balance: JSON.parse(balanceFromLocalStorage),
+        });
+      } else {
+        throw new Error(messageError);
+      }
+    } catch (messageError) {
+      console.error(messageError);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { transactions } = this.state;
+    const { balance } = this.state;
+    if (
+      prevState.transactions !== transactions &&
+      prevState.balance !== balance
+    ) {
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+      localStorage.setItem('balance', JSON.stringify(balance));
+    }
+  }
+
   handleDeposit = () => {
     const { amount } = this.state;
     if (amount === 0 || amount < 0) {
